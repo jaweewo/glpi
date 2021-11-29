@@ -1,0 +1,94 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apache
+  namespace: default
+data:
+  000-default.conf:
+    <VirtualHost *:80>
+          ServerName glpi.example.com
+          DocumentRoot /var/www/html/glpi
+            <Directory /var/www/html/glpi>
+                    AllowOverride All
+                    Order Allow,Deny
+                    Allow from all
+            </Directory>
+            ErrorLog /var/log/apache2/error-glpi.log
+            LogLevel warn
+            CustomLog /var/log/apache2/access-glpi.log combined
+    </VirtualHost>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: glpi
+  labels:
+    app: glpi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: glpi
+  template:
+    metadata:
+      labels:
+        app: glpi
+    spec:
+      volumes:
+      - name: config
+        configMap:
+          name: apache
+            
+      containers:
+      - name: glpi
+        image: jaweewo/glpi
+        resources:
+          requests:
+            memory: "250Mi"
+            cpu: "300m"
+          limits:
+            memory: "700Mi"
+            cpu: "1000m"
+        ports:
+        - name: glpi
+          containerPort: 80
+        volumeMounts:
+        - name: config
+          mountPath: "/etc/apache2/sites-available/000-default.conf"
+          readOnly: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: glpi
+  namespace: default
+spec:
+  selector:
+    app: glpi
+  ports:
+  - name: glpi
+    port: 80
+    targetPort: glpi
+    protocol: TCP
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: glpi
+  namespace: default
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`glpi.example.com`)
+    kind: Rule
+    services:
+    - name: glpi
+      port: 80
+      
+
+
+
+
