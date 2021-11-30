@@ -2,7 +2,7 @@
 
 #Controle du choix de version ou prise de la latest
 [[ ! "$VERSION_GLPI" ]] \
-	&& VERSION_GLPI="9.1.6"
+	&& VERSION_GLPI="9.2.4"
 
 
 if [[ -z "${TIMEZONE}" ]]; then echo "TIMEZONE is unset"; 
