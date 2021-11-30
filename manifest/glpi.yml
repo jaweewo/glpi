@@ -5,11 +5,15 @@ metadata:
   name: apache
   namespace: default
 data:
-  000-default.conf:
+  000-default.conf: |
     <VirtualHost *:80>
           ServerName glpi.example.com
           DocumentRoot /var/www/html/glpi
-            <Directory /var/www/html/glpi>
+          Header set Access-Control-Allow-Origin "*"
+          Header set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
+          Header set Access-Control-Allow-Credentials true
+          Header set Access-Control-Allow-Headers "X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token Accept-Encoding, App-Token, Session-Token"
+          <Directory /var/www/html/glpi>
                     AllowOverride All
                     Order Allow,Deny
                     Allow from all
@@ -56,7 +60,7 @@ spec:
           containerPort: 80
         volumeMounts:
         - name: config
-          mountPath: "/etc/apache2/sites-available/000-default.conf"
+          mountPath: "/etc/apache2/sites-available/"
           readOnly: true
 ---
 apiVersion: v1
