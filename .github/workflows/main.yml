@@ -3,7 +3,7 @@ name: ci
 on:
   push:
     branches:
-      - 'kubernetes'
+      - 'GLPI-9.4.6'
 
 jobs:
   docker:
@@ -27,4 +27,4 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: jaweewo/glpi:kubernetes
+          tags: jaweewo/glpi:9.4.6
